@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <script src="./utils.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <body>
+    <canvas id=canvas></canvas>
+    <script>
+        window.onload = function() {
+          //TODO: replace mock promise with AJAX request
+            Promise.resolve(
+              {
+                failed_builds: [
+                  {
+                    date: '2018-01-22',
+                    count: 22,
+                  },
+                  {
+                    date: '2018-01-21',
+                    count: 20,
+                  },
+                  {
+                    date: '2018-01-20',
+                    count: 18,
+                  },
+                  {
+                    date: '2018-01-19',
+                    count: 12,
+                  },
+                ],
+                passed_builds: [
+                  {
+                    date: '2018-01-22',
+                    count: 13,
+                  },
+                  {
+                    date: '2018-01-21',
+                    count: 15,
+                  },
+                  {
+                    date: '2018-01-20',
+                    count: 19,
+                  },
+                  {
+                    date: '2018-01-19',
+                    count: 23,
+                  },      
+                ],
+                pending_builds: [
+                  {
+                    date: 1516652049915,
+                    count: 1,
+                  },
+                  {
+                    date: 1516652043409,
+                    count: 2,
+                  },
+                ]             
+              }
+            ).then(response => {
+              
+              var lineChartData = {
+                  labels: generateLabels(response.passed_builds),
+                  datasets: [{
+                      label: "Failing builds",
+                      borderColor: 'red',
+                      backgroundColor: 'red',
+                      fill: false,
+                      data: filterCounts(response.failed_builds),
+                      yAxisID: "y-axis-1",
+                  }, {
+                      label: "Passing builds",
+                      borderColor: 'green',
+                      backgroundColor: 'green',
+                      fill: false,
+                      data: filterCounts(response.passed_builds),
+                      yAxisID: "y-axis-1"
+                  }]
+              };
+              renderChart(lineChartData);
+            })
+          }
+            
+          function renderChart(lineChartData) {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = Chart.Line(ctx, {
+              data: lineChartData,
+              options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                title:{
+                  display: true,
+                  text:'Build Failure/Success Rate for Last 30 Days'
+                },
+                scales: {
+                  yAxes: [{
+                    type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                    display: true,
+                    position: "left",
+                    id: "y-axis-1",
+                  }],
+                }
+              }
+            });
+          };
+    </script>
+  </body>
+</html>
